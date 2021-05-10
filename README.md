@@ -7,9 +7,9 @@ The SWAN SID Salt implementation in go.
 In SWAN, the Salt field is appended as additional data when hashing the email 
 address to produce the Signed-in Identifier (SID). 
 
-The salt is made up of four 4 bit numbers (0-15).
+The salt is made up of four 4-bit numbers (0-15).
 
-It is represented as 2 bytes or a byte array with a length of two, this allows 
+It is represented as a byte array with a length of two which allows 
 for 65535 unique combinations.
 
 The visual representation of the salt is a 4x4 grid:
@@ -52,14 +52,14 @@ The conversion is performed using bit shifting to pack two nibbles into one byte
 |0|0 & 1|
 |1|2 & 3|
 
-Nibble 1 & 3 form the first 4 bits of their respective byte and 0 & 2 are bit 
+Nibble 1 & 3 form the first 4 bits of their respective bytes and 0 & 2 are bit 
 shifted to the left by 4 places to make up the remaining part of their respective 
 bytes.
 
 The reverse is done to turn the 2 bytes back in the the original 4 numbers that 
 represent the selection.
 
-This allows the value to appended to the byte representation of the email and 
+This value can be appended to the byte representation of the email and 
 also means the value can be converted to base 64 for transmission. 
 
 ### Example
@@ -175,6 +175,14 @@ s.Number(4) // returns "1"
 s.Number(7) // returns "2"
 
 s.Number(1) // returns ""
+```
+
+### GetBytes
+
+Gets the Salt value as a byte array.
+
+```go
+s.GetBytes() // returns [54, 156]
 ```
 
 ### ToBase64String

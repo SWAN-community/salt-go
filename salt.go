@@ -26,7 +26,7 @@ import (
 // Salt struct.
 type Salt struct {
 	Data []byte // byte array containing the salt value, should always have a
-	// length of 4
+	// length of 4, values should have a max value of 15.
 }
 
 // Create a new instance of Salt from a Base 64 representation. Turn the Base 64
@@ -45,6 +45,14 @@ func NewSalt(data string) (*Salt, error) {
 		return nil, fmt.Errorf("invalid salt")
 	}
 
+	// Set the data from the byte array.
+	s.Data = bytesAsSalt(b)
+
+	return &s, nil
+}
+
+// Get the salt value from a byte array.
+func bytesAsSalt(b []byte) []byte {
 	// Unpack the 4 nibbles from the two bytes. For each byte, bit shift the
 	// byte to the right by 4 to get the first nibble, apply the bitwise AND
 	// operator against the byte and a value of 16 (0xF) to get the first 4 bits
@@ -52,9 +60,21 @@ func NewSalt(data string) (*Salt, error) {
 	n1, n2 := b[0]>>4, b[0]&0xF
 	n3, n4 := b[1]>>4, b[1]&0xF
 
-	s.Data = []byte{n1, n2, n3, n4}
+	return []byte{n1, n2, n3, n4}
+}
 
-	return &s, nil
+// Get a salt value as bytes.
+func saltAsBytes(data []byte) []byte {
+	// Pack the 4 nibbles representing the selected items into two bytes.
+	// Bit shift the first nibble to the left by 4 and the OR the result with
+	// the first nibble to produce the first byte. Repeat for the third and
+	// fourth nibble to create the second byte.
+	b1 := (data[0] << 4) | data[1]
+	b2 := (data[2] << 4) | data[3]
+
+	// Return the array.
+	return []byte{b1, b2}
+
 }
 
 // For a given index 1-16, return whether the visual representation relating to
@@ -80,19 +100,15 @@ func (s Salt) Number(i int) string {
 	return strings.Join(is[:], " ")
 }
 
+// Get the Salt value as a byte array.
+func (s Salt) GetBytes() []byte {
+	return saltAsBytes(s.Data)
+}
+
 // Get the Base 64 representation of the Salt value.
 func (s Salt) ToBase64String() string {
-
-	// Pack the 4 nibbles representing the selected items into two bytes.
-	// Bit shift the first nibble to the left by 4 and the OR the result with
-	// the first nibble to produce the first byte. Repeat for the third and
-	// fourth nibble to create the second byte.
-	b1 := (s.Data[0] << 4) | s.Data[1]
-	b2 := (s.Data[2] << 4) | s.Data[3]
-
-	// Form the array.
-	b := []byte{b1, b2}
-
+	// Get the byte array.
+	b := saltAsBytes(s.Data)
 	// Convert the byte array to a Base64 string.
 	return base64.RawStdEncoding.EncodeToString(b)
 }
