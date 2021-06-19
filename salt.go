@@ -43,7 +43,7 @@ func FromByteArray(bytes []byte) (*Salt, error) {
 // the Base 64 string into a byte array of length 2 and then unpack the 4
 // nibbles from the 2 bytes.
 func FromBase64(data string) (*Salt, error) {
-	b, err := base64.RawStdEncoding.DecodeString(data)
+	b, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (s Salt) ToBase64String() string {
 	// Get the byte array.
 	b := saltAsBytes(s.bytes)
 	// Convert the byte array to a Base64 string.
-	return base64.RawStdEncoding.EncodeToString(b)
+	return base64.StdEncoding.EncodeToString(b)
 }
 
 // Get the salt value from a byte array.
