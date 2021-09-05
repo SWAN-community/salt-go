@@ -34,7 +34,7 @@ type Salt struct {
 // Length of bytes array should always be 2.
 func FromByteArray(bytes []byte) (*Salt, error) {
 	if len(bytes) != 2 {
-		return nil, fmt.Errorf("invalid salt")
+		return nil, fmt.Errorf("salt of length '%d' invalid", len(bytes))
 	}
 	return &Salt{bytes: bytesAsSalt(bytes)}, nil
 }
